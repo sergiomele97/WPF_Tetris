@@ -5,11 +5,13 @@
         xmlns:mc="http://schemas.openxmlformats.org/markup-compatibility/2006"
         xmlns:local="clr-namespace:WPFapp1"
         mc:Ignorable="d"
-        Title="WPF-Tetris" Height="450" Width="800">
+        Title="WPF-Tetris" SizeToContent="WidthAndHeight" ContentRendered="Window_ContentRendered">
 
-        <Canvas>
-            <Button>Button1</Button>
+    <Border BorderBrush="Black" BorderThickness="1">
+        <Canvas Name="GameArea" ClipToBounds="True" Width="300" Height="480">
+
         </Canvas>
-    
-    
+    </Border>
+
+
 </Window>
