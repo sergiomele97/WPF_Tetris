@@ -24,7 +24,7 @@ namespace WPFapp1
         int posY = 0;
         List<Pieza> ListaPiezas = new List<Pieza>();
         int piezaActiva = -1;                // Señala el indice de la lista con la pieza en movimiento
-        int cont_rect = 0;
+        int nGameAreaChildren = 0;
 
         private System.Windows.Threading.DispatcherTimer gameTickTimer = new System.Windows.Threading.DispatcherTimer(); // Tema del tiempo
         int speed = 1;  // ¡! Inversamente proporcional
@@ -61,7 +61,7 @@ namespace WPFapp1
 
         //---------------------------------------------------------------------------------------------------------------------------------------------//
         /*
-        *  EJECUTAR EVERY TICK
+        *  EJECUTAR EVERY TICK (BUCLE PRINCIPAL DEL JUEGO)
         */
 
         private void GameTickTimer_Tick(object sender, EventArgs e)
@@ -75,7 +75,7 @@ namespace WPFapp1
             ActualizarPiezas();        
         }
 
-
+        //---------------------------------------------------------------------------------------------------------------------------------------------//
         // ACTUALIZAR PIEZAS
         private void ActualizarPiezas()
         {
@@ -90,6 +90,7 @@ namespace WPFapp1
             }
         }
 
+        // COLISIONES
         private bool IsCollision()  // Si para uno solo de los bloques, hay pieza en [x,y+1]: devuelve true
         {
             for (int i = 0; i < tamañoPiezas; i++)
@@ -120,6 +121,7 @@ namespace WPFapp1
             }
         }
 
+        // FIN DE PARTIDA
         private bool IsGameOver()
         {
             for (int i = 0; i < tamañoPiezas; i++)
@@ -171,7 +173,7 @@ namespace WPFapp1
             };
 
             GameArea.Children.Add(rect);
-            cont_rect++;
+            nGameAreaChildren++;
             Canvas.SetLeft(rect, x);
             Canvas.SetTop(rect, y);
         }
@@ -187,7 +189,7 @@ namespace WPFapp1
             for (int i = 0; i < tamañoPiezas; i++)
             {
 
-                ListaPiezas[piezaActiva].ArrayBloques[i] = cont_rect;
+                ListaPiezas[piezaActiva].ArrayBloques[i] = nGameAreaChildren;
 
                 DrawBloque(ListaPiezas[piezaActiva].posBloquesX[i], ListaPiezas[piezaActiva].posBloquesY[i]);
 
@@ -214,7 +216,7 @@ namespace WPFapp1
                     };
 
                     GameArea.Children.Add(rect);
-                    cont_rect++;
+                    nGameAreaChildren++;
                     Canvas.SetLeft(rect, i*30);
                     Canvas.SetTop(rect, j*30);
                 }               

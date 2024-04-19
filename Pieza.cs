@@ -7,7 +7,7 @@ using System.Threading.Tasks;
 
 namespace WPFapp1
 {
-    public class Pieza
+    public class Pieza                  // Una pieza esta formada por 4 bloques
     {
         public int tipo = 0;           //geometria
         public int orientación = 0;   //orientacion
