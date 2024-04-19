@@ -24,15 +24,25 @@ namespace WPFapp1
         int posY = 0;
         List<Pieza> ListaPiezas = new List<Pieza>();
         int piezaActiva = -1;                // Señala el indice de la lista con la pieza en movimiento
-        int cont_rect = 0;  
-        private System.Windows.Threading.DispatcherTimer gameTickTimer = new System.Windows.Threading.DispatcherTimer(); // Tema del tiempo
+        int cont_rect = 0;
 
+        private System.Windows.Threading.DispatcherTimer gameTickTimer = new System.Windows.Threading.DispatcherTimer(); // Tema del tiempo
+        int speed = 1;  // ¡! Inversamente proporcional
+
+        int tamañoPiezas = 4;
+        int pixelesCuadrado = 30;
+        int nCasillasX = 10;
+        int nCasillasY = 16;
+
+        bool[,] tablero = new bool[10, 17]; // Array booleano con posiciones tablero
+        
 
         //---------------------------------------------------------------------------------------------------------------------------------------------//
-
         /*
          *  CONSTRUCTOR VENTANA
          */
+
+        // VENTANA
         public MainWindow()
         {
             InitializeComponent();  // This call combines the .cs and xaml partial clases
@@ -40,19 +50,16 @@ namespace WPFapp1
         }
 
 
-        /*
-         *  CONTENIDO INICIAL
-         */
+        // CONTENIDO INICIAL VENTANA
         private void Window_ContentRendered(object sender, EventArgs e)
         {
-            DrawBackground();
+            InitializeBackground();
             StartNewGame();
             DrawNext();
         }
 
 
         //---------------------------------------------------------------------------------------------------------------------------------------------//
-
         /*
         *  EJECUTAR EVERY TICK
         */
@@ -64,9 +71,12 @@ namespace WPFapp1
 
         private void NextTick()
         {
+            IsCollision();
             ActualizarPiezas();        
         }
 
+
+        // ACTUALIZAR PIEZAS
         private void ActualizarPiezas()
         {
             if (ListaPiezas[piezaActiva].bajando == false)      // Cuando para de bajar
@@ -74,13 +84,59 @@ namespace WPFapp1
                 DrawNext();
             }
 
-            for (int i = 0; i < ListaPiezas[piezaActiva].ArrayBloques.Length; i++)
+            for (int i = 0; i < tamañoPiezas; i++)
             {
-
                 Canvas.SetTop(GameArea.Children[ListaPiezas[piezaActiva].ArrayBloques[i]], ListaPiezas[piezaActiva].posBloquesY[i]++);
             }
         }
 
+        private bool IsCollision()  // Si para uno solo de los bloques, hay pieza en [x,y+1]: devuelve true
+        {
+            for (int i = 0; i < tamañoPiezas; i++)
+            {
+                if (tablero[(ListaPiezas[piezaActiva].posBloquesX[i] + 30)/pixelesCuadrado, (ListaPiezas[piezaActiva].posBloquesY[i] + 31) / pixelesCuadrado])
+                {
+                    // Si hay colisión: Actualizamos pieza, tablero y devolvemos true
+
+                    Collision();
+
+                    return true;                                // Devolver isColision() = True
+                }
+            }
+            return false;
+        }
+
+        private void Collision()
+        {
+            ListaPiezas[piezaActiva].bajando = false;   // Actualizar Pieza
+            for (int c = 0; c < tamañoPiezas; c++)      // Actualizar Tablero
+            {
+                tablero[(ListaPiezas[piezaActiva].posBloquesX[c]) / pixelesCuadrado, (ListaPiezas[piezaActiva].posBloquesY[c] + 1) / pixelesCuadrado] = true;
+            }
+
+            if (IsGameOver())
+            {
+                GameOver();
+            }
+        }
+
+        private bool IsGameOver()
+        {
+            for (int i = 0; i < tamañoPiezas; i++)
+            {
+                if (ListaPiezas[piezaActiva].posBloquesY[i] < 0)
+                {
+                    return true;
+                }
+            }
+            return false;
+        }
+
+        private void GameOver()
+        {
+            gameTickTimer.IsEnabled = false;
+            MessageBox.Show("GAME OVER :(");
+        }
 
         //---------------------------------------------------------------------------------------------------------------------------------------------//
         /*
@@ -89,12 +145,10 @@ namespace WPFapp1
 
         private void StartNewGame()
         {
-            gameTickTimer.Interval = TimeSpan.FromMilliseconds(40);
+            gameTickTimer.Interval = TimeSpan.FromMilliseconds(speed);
 
             // Go!          
             gameTickTimer.IsEnabled = true;
-            
-
         }
 
 
@@ -103,12 +157,13 @@ namespace WPFapp1
         *  DIBUJADO
         */
 
+        // Dibuja un cuadrado
         public void DrawBloque(int x,int y)
         {
             Rectangle rect = new Rectangle
             {
-                Width = 30,
-                Height = 30,
+                Width = pixelesCuadrado,
+                Height = pixelesCuadrado,
                 Fill = Brushes.Yellow,
                 Stroke = Brushes.Black,
                 StrokeThickness = 2
@@ -121,15 +176,15 @@ namespace WPFapp1
             Canvas.SetTop(rect, y);
         }
 
-        //  Inicializa la siguiente pieza
 
+        //  Inicializa la siguiente pieza
         private void DrawNext()
         {
             piezaActiva++;
             Pieza pieza = new Pieza();
             ListaPiezas.Add(pieza);
 
-            for (int i = 0; i < ListaPiezas[piezaActiva].ArrayBloques.Length; i++)
+            for (int i = 0; i < tamañoPiezas; i++)
             {
 
                 ListaPiezas[piezaActiva].ArrayBloques[i] = cont_rect;
@@ -144,9 +199,9 @@ namespace WPFapp1
         // Dibuja el fondo
         private void DrawBackground()
         {
-            for (int i = 0; i < GameArea.Width; i += 30)
+            for (int i = 0; i < nCasillasX; i++)
             {
-                for (int j = 0; j < GameArea.Height; j += 30)
+                for (int j = 0; j < nCasillasY; j++)
                 {
                     Rectangle rect = new Rectangle
                     {
@@ -160,10 +215,22 @@ namespace WPFapp1
 
                     GameArea.Children.Add(rect);
                     cont_rect++;
-                    Canvas.SetLeft(rect, i);
-                    Canvas.SetTop(rect, j);
+                    Canvas.SetLeft(rect, i*30);
+                    Canvas.SetTop(rect, j*30);
                 }               
             }
+        }
+
+        // Inicializar tablero
+
+        private void InitializeBackground()
+        {
+            for(int i = 0; i < nCasillasX; i++) // Crea un fondo invisibles en el tablero
+            {
+                tablero[i, 16] = true;
+            }
+
+            DrawBackground();
         }
 
         //---------------------------------------------------------------------------------------------------------------------------------------------//

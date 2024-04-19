@@ -16,11 +16,12 @@ namespace WPFapp1
         public int y = 0;              //posicion Y
 
         public bool bajando = true;    // Bajando o parada
-        public int[] ArrayBloques = new int[4] { 0, 0, 0, 0 };
 
-        public int[] posBloquesX = new int[4] { 150, 180, 210, 240 };
+        public int[] ArrayBloques = new int[4] { 0, 0, 0, 0 };  // Posición de children.add()
 
-        public int[] posBloquesY = new int[4] { 0, 0, 0, 0 };
+        public int[] posBloquesX = new int[4] { 150, 180, 210, 240 };   // Posición en X
+
+        public int[] posBloquesY = new int[4] { -30, -30, -30, -30 };  // Posición en Y         
 
 
 
