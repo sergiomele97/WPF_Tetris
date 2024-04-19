@@ -19,7 +19,7 @@ namespace WPFapp1
     {
         //---------------------------------------------------------------------------------------------------------------------------------------------//
         /* 
-         *  VARIABLES INICIALES
+         *  VARIABLES INICIALES 
          */
         int posY = 0;
         List<Pieza> ListaPiezas = new List<Pieza>();
