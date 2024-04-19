@@ -19,13 +19,14 @@ namespace WPFapp1
     {
         //---------------------------------------------------------------------------------------------------------------------------------------------//
         /* 
-         *  VARIABLES INICIALES 
+         *  VARIABLES GLOBALES 
          */
         int posY = 0;
         List<Pieza> ListaPiezas = new List<Pieza>();
         int piezaActiva = -1;                // Señala el indice de la lista con la pieza en movimiento
         int cont_rect = 0;  
         private System.Windows.Threading.DispatcherTimer gameTickTimer = new System.Windows.Threading.DispatcherTimer(); // Tema del tiempo
+
 
         //---------------------------------------------------------------------------------------------------------------------------------------------//
 
@@ -36,8 +37,8 @@ namespace WPFapp1
         {
             InitializeComponent();  // This call combines the .cs and xaml partial clases
             gameTickTimer.Tick += GameTickTimer_Tick;
-
         }
+
 
         /*
          *  CONTENIDO INICIAL
@@ -47,27 +48,44 @@ namespace WPFapp1
             DrawBackground();
             StartNewGame();
             DrawNext();
-
         }
+
 
         //---------------------------------------------------------------------------------------------------------------------------------------------//
 
         /*
-        *  Incluir aquí el contenido de cada tick
+        *  EJECUTAR EVERY TICK
         */
+
         private void GameTickTimer_Tick(object sender, EventArgs e)
         {
             NextTick();
-            
         }
 
         private void NextTick()
         {
             ActualizarPiezas();        
-
         }
 
-       
+        private void ActualizarPiezas()
+        {
+            if (ListaPiezas[piezaActiva].bajando == false)      // Cuando para de bajar
+            {
+                DrawNext();
+            }
+
+            for (int i = 0; i < ListaPiezas[piezaActiva].ArrayBloques.Length; i++)
+            {
+
+                Canvas.SetTop(GameArea.Children[ListaPiezas[piezaActiva].ArrayBloques[i]], ListaPiezas[piezaActiva].posBloquesY[i]++);
+            }
+        }
+
+
+        //---------------------------------------------------------------------------------------------------------------------------------------------//
+        /*
+        *  NUEVA PARTIDA
+        */
 
         private void StartNewGame()
         {
@@ -79,7 +97,11 @@ namespace WPFapp1
 
         }
 
-        // Area para dibujado
+
+        //---------------------------------------------------------------------------------------------------------------------------------------------//
+        /*
+        *  DIBUJADO
+        */
 
         public void DrawBloque(int x,int y)
         {
@@ -97,24 +119,6 @@ namespace WPFapp1
             cont_rect++;
             Canvas.SetLeft(rect, x);
             Canvas.SetTop(rect, y);
-        }
-
-        // Espacio que va a ejecutarse cada tick
-
-        private void ActualizarPiezas()
-        {
-            if (ListaPiezas[piezaActiva].bajando == false)      // Cuando para de bajar
-            {
-                DrawNext();
-            }
-            
-            for(int i = 0; i < ListaPiezas[piezaActiva].ArrayBloques.Length; i++)
-            {
-                
-                Canvas.SetTop(GameArea.Children[ListaPiezas[piezaActiva].ArrayBloques[i]], ListaPiezas[piezaActiva].posBloquesY[i]++);
-            }
-            
-            
         }
 
         //  Inicializa la siguiente pieza
@@ -137,6 +141,7 @@ namespace WPFapp1
             
         }
 
+        // Dibuja el fondo
         private void DrawBackground()
         {
             for (int i = 0; i < GameArea.Width; i += 30)
@@ -161,7 +166,10 @@ namespace WPFapp1
             }
         }
 
-        // Area para gestion de controles
+        //---------------------------------------------------------------------------------------------------------------------------------------------//
+        /*
+        *  CONTROLES
+        */
 
         private void Window_KeyUp(object sender, KeyEventArgs e)
         {
