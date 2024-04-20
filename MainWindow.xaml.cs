@@ -21,6 +21,7 @@ namespace WPFapp1
         /* 
          *  VARIABLES GLOBALES 
          */
+
         int posY = 0;
         List<Pieza> ListaPiezas = new List<Pieza>();
         int piezaActiva = -1;                // Señala el indice de la lista con la pieza en movimiento
@@ -37,14 +38,27 @@ namespace WPFapp1
         bool[,] tablero = new bool[12, 17]; // Array booleano con posiciones tablero
 
         bool input = false;  // Determina si se permite el input de teclas
-        
+
+        Random rnd = new Random();  // Para generar piezas aleatorias
+
 
         //---------------------------------------------------------------------------------------------------------------------------------------------//
         /*
          *  CONSTRUCTOR VENTANA
          */
 
+
         // VENTANA
+
+        /*  En ocasiones aparece un bug de visual studio: "InitializeComponent() no existe en el contexto actual"
+         *  Permite compilar sin problemas, pero señala error.
+         *  
+         *  Solución:
+         *      Navigate to the solution directory
+         *      Delete the \obj folder
+         *      Rebuild the solution
+         */
+
         public MainWindow()
         {
             InitializeComponent();  // This call combines the .cs and xaml partial clases
@@ -94,6 +108,7 @@ namespace WPFapp1
             }
         }
 
+        //---------------------------------------------------------------------------------------------------------------------------------------------//
         // COLISIONES
         private bool IsBottomCollision()  // Si para uno solo de los bloques, hay pieza en [x,y+1]: devuelve true
         {
@@ -214,7 +229,7 @@ namespace WPFapp1
         private void InitializeNextPieza()
         {
             piezaActiva++;
-            Pieza pieza = new Pieza();
+            Pieza pieza = new Pieza(rnd.Next(1,8));     // Le pasamos un numero random del 1 al 7
             ListaPiezas.Add(pieza);
 
             for (int i = 0; i < tamañoPiezas; i++)
