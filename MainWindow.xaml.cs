@@ -27,7 +27,7 @@ namespace WPFapp1
         int nGameAreaChildren = 0;
 
         private System.Windows.Threading.DispatcherTimer gameTickTimer = new System.Windows.Threading.DispatcherTimer(); // Tema del tiempo
-        int speed = 1;  // ¡! Inversamente proporcional
+        double gameSpeed = 1;  // ¡! Inversamente proporcional
 
         int tamañoPiezas = 4;
         int pixelesCuadrado = 30;
@@ -46,7 +46,7 @@ namespace WPFapp1
         public MainWindow()
         {
             InitializeComponent();  // This call combines the .cs and xaml partial clases
-            gameTickTimer.Tick += GameTickTimer_Tick;
+            gameTickTimer.Tick += GameTickTimer_Tick;   // Le pasamos la función GameTickTimer_Tick
         }
 
 
@@ -86,7 +86,7 @@ namespace WPFapp1
 
             for (int i = 0; i < tamañoPiezas; i++)
             {
-                Canvas.SetTop(GameArea.Children[ListaPiezas[piezaActiva].ArrayBloques[i]], ListaPiezas[piezaActiva].posBloquesY[i]++);
+                Canvas.SetTop(GameArea.Children[ListaPiezas[piezaActiva].ArrayBloques[i]], ListaPiezas[piezaActiva].posBloquesY[i]+=30);
             }
         }
 
@@ -147,7 +147,7 @@ namespace WPFapp1
 
         private void StartNewGame()
         {
-            gameTickTimer.Interval = TimeSpan.FromMilliseconds(speed);
+            gameTickTimer.Interval = TimeSpan.FromSeconds(gameSpeed);
 
             // Go!          
             gameTickTimer.IsEnabled = true;
