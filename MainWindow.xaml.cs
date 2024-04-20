@@ -35,6 +35,8 @@ namespace WPFapp1
         int nCasillasY = 16;
 
         bool[,] tablero = new bool[12, 17]; // Array booleano con posiciones tablero
+
+        bool input = false;  // Determina si se permite el input de teclas
         
 
         //---------------------------------------------------------------------------------------------------------------------------------------------//
@@ -88,6 +90,7 @@ namespace WPFapp1
             for (int i = 0; i < tamañoPiezas; i++)
             {
                 Canvas.SetTop(GameArea.Children[ListaPiezas[piezaActiva].ArrayBloques[i]], ListaPiezas[piezaActiva].posBloquesY[i]+=30);
+                input = true;           // Colocarlo aquí asegura que X e Y no tengan valores negativos mientras haya input
             }
         }
 
@@ -100,6 +103,7 @@ namespace WPFapp1
                 {
                     // Si hay colisión: Actualizamos pieza, tablero y devolvemos true
 
+                    input = false;
                     BottomCollision();
 
                     return true;                                // Devolver isColision() = True
@@ -135,6 +139,7 @@ namespace WPFapp1
         private void BottomCollision()
         {
             ListaPiezas[piezaActiva].bajando = false;   // Actualizar Pieza
+
             for (int c = 0; c < tamañoPiezas; c++)      // Actualizar Tablero
             {
                 tablero[(ListaPiezas[piezaActiva].posBloquesX[c]) / pixelesCuadrado + 1, (ListaPiezas[piezaActiva].posBloquesY[c] + 1) / pixelesCuadrado] = true;   // +1 compensa la primera columna pared del tablero
@@ -144,6 +149,7 @@ namespace WPFapp1
             {
                 GameOver();
             }
+
         }
 
         // FIN DE PARTIDA
@@ -272,7 +278,7 @@ namespace WPFapp1
             switch (e.Key)
             {
                 case Key.Left:
-                    if (!IsLeftCollision()) 
+                    if (input && !IsLeftCollision())    //  IMPORTANTE && y orden operandos: Si llamamos a !IsLeftC... cuando no se admite input, el juego puede crashear
                     { 
                         for (int i = 0; i < tamañoPiezas; i++)
                         {
@@ -282,7 +288,7 @@ namespace WPFapp1
                     break;
                 
                 case Key.Right:
-                    if (!IsRightCollision())
+                    if (input && !IsRightCollision())   //  IMPORTANTE && y orden operandos: Si llamamos a !IsLeftC... cuando no se admite input, el juego puede crashear
                     {
                         for (int i = 0; i < tamañoPiezas; i++)
                         {
