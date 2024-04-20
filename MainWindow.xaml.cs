@@ -82,6 +82,7 @@ namespace WPFapp1
             if (ListaPiezas[piezaActiva].bajando == false)      // Cuando para de bajar
             {
                 InitializeNextPieza();
+                return;                  // Impide que se ejecute lo siguiente, perimitiendo que se den las condiciones para terminar la partida
             }
 
             for (int i = 0; i < tamañoPiezas; i++)
@@ -95,7 +96,7 @@ namespace WPFapp1
         {
             for (int i = 0; i < tamañoPiezas; i++)
             {
-                if (tablero[(ListaPiezas[piezaActiva].posBloquesX[i] + 30) / pixelesCuadrado, (ListaPiezas[piezaActiva].posBloquesY[i] + 31) / pixelesCuadrado])    // +30 compensa la primera columna pared del tablero
+                if (tablero[(ListaPiezas[piezaActiva].posBloquesX[i] + 30) / pixelesCuadrado, (ListaPiezas[piezaActiva].posBloquesY[i] + 30) / pixelesCuadrado])    // +30 compensa la primera columna pared del tablero
                 {
                     // Si hay colisión: Actualizamos pieza, tablero y devolvemos true
 
