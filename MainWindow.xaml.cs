@@ -27,14 +27,14 @@ namespace WPFapp1
         int nGameAreaChildren = 0;
 
         private System.Windows.Threading.DispatcherTimer gameTickTimer = new System.Windows.Threading.DispatcherTimer(); // Tema del tiempo
-        double gameSpeed = 1;  // ¡! Inversamente proporcional
+        double gameSpeed = 0.1;  // ¡! Inversamente proporcional
 
         int tamañoPiezas = 4;
         int pixelesCuadrado = 30;
         int nCasillasX = 10;
         int nCasillasY = 16;
 
-        bool[,] tablero = new bool[10, 17]; // Array booleano con posiciones tablero
+        bool[,] tablero = new bool[12, 17]; // Array booleano con posiciones tablero
         
 
         //---------------------------------------------------------------------------------------------------------------------------------------------//
@@ -55,7 +55,7 @@ namespace WPFapp1
         {
             InitializeBackground();
             StartNewGame();
-            DrawNext();
+            InitializeNextPieza();
         }
 
 
@@ -71,7 +71,7 @@ namespace WPFapp1
 
         private void NextTick()
         {
-            IsCollision();
+            IsBottomCollision();
             ActualizarPiezas();        
         }
 
@@ -81,7 +81,7 @@ namespace WPFapp1
         {
             if (ListaPiezas[piezaActiva].bajando == false)      // Cuando para de bajar
             {
-                DrawNext();
+                InitializeNextPieza();
             }
 
             for (int i = 0; i < tamañoPiezas; i++)
@@ -91,15 +91,15 @@ namespace WPFapp1
         }
 
         // COLISIONES
-        private bool IsCollision()  // Si para uno solo de los bloques, hay pieza en [x,y+1]: devuelve true
+        private bool IsBottomCollision()  // Si para uno solo de los bloques, hay pieza en [x,y+1]: devuelve true
         {
             for (int i = 0; i < tamañoPiezas; i++)
             {
-                if (tablero[(ListaPiezas[piezaActiva].posBloquesX[i] + 30)/pixelesCuadrado, (ListaPiezas[piezaActiva].posBloquesY[i] + 31) / pixelesCuadrado])
+                if (tablero[(ListaPiezas[piezaActiva].posBloquesX[i] + 30) / pixelesCuadrado, (ListaPiezas[piezaActiva].posBloquesY[i] + 31) / pixelesCuadrado])    // +30 compensa la primera columna pared del tablero
                 {
                     // Si hay colisión: Actualizamos pieza, tablero y devolvemos true
 
-                    Collision();
+                    BottomCollision();
 
                     return true;                                // Devolver isColision() = True
                 }
@@ -107,12 +107,36 @@ namespace WPFapp1
             return false;
         }
 
-        private void Collision()
+        private bool IsRightCollision()
+        {
+            for (int i = 0; i < tamañoPiezas; i++)
+            {
+                if (tablero[(ListaPiezas[piezaActiva].posBloquesX[i] + 60) / pixelesCuadrado, (ListaPiezas[piezaActiva].posBloquesY[i]) / pixelesCuadrado])         // +61 compensa la primera columna + next cuadrado
+                {
+                    return true;                                // Colision lateral          
+                }
+            }
+            return false;
+        }
+
+        private bool IsLeftCollision()
+        {
+            for (int i = 0; i < tamañoPiezas; i++)
+            {
+                if (tablero[(ListaPiezas[piezaActiva].posBloquesX[i]) / pixelesCuadrado, (ListaPiezas[piezaActiva].posBloquesY[i]) / pixelesCuadrado])         
+                {
+                    return true;                                // Colision lateral          
+                }
+            }
+            return false;
+        }
+
+        private void BottomCollision()
         {
             ListaPiezas[piezaActiva].bajando = false;   // Actualizar Pieza
             for (int c = 0; c < tamañoPiezas; c++)      // Actualizar Tablero
             {
-                tablero[(ListaPiezas[piezaActiva].posBloquesX[c]) / pixelesCuadrado, (ListaPiezas[piezaActiva].posBloquesY[c] + 1) / pixelesCuadrado] = true;
+                tablero[(ListaPiezas[piezaActiva].posBloquesX[c]) / pixelesCuadrado + 1, (ListaPiezas[piezaActiva].posBloquesY[c] + 1) / pixelesCuadrado] = true;   // +1 compensa la primera columna pared del tablero
             }
 
             if (IsGameOver())
@@ -180,7 +204,7 @@ namespace WPFapp1
 
 
         //  Inicializa la siguiente pieza
-        private void DrawNext()
+        private void InitializeNextPieza()
         {
             piezaActiva++;
             Pieza pieza = new Pieza();
@@ -188,15 +212,12 @@ namespace WPFapp1
 
             for (int i = 0; i < tamañoPiezas; i++)
             {
-
                 ListaPiezas[piezaActiva].ArrayBloques[i] = nGameAreaChildren;
 
                 DrawBloque(ListaPiezas[piezaActiva].posBloquesX[i], ListaPiezas[piezaActiva].posBloquesY[i]);
-
-            }
-
-            
+            }   
         }
+
 
         // Dibuja el fondo
         private void DrawBackground()
@@ -224,12 +245,17 @@ namespace WPFapp1
         }
 
         // Inicializar tablero
-
         private void InitializeBackground()
         {
             for(int i = 0; i < nCasillasX; i++) // Crea un fondo invisibles en el tablero
             {
-                tablero[i, 16] = true;
+                tablero[i + 1, 16] = true;  // +1 para compensar la primera columna vacia
+            }
+
+            for (int i = 0; i < nCasillasY; i++) // Crea un fondo invisibles a los lados
+            {
+                tablero[0, i] = true;
+                tablero[11, i] = true;
             }
 
             DrawBackground();
@@ -244,17 +270,28 @@ namespace WPFapp1
         {
             switch (e.Key)
             {
-                case Key.Up:
-                    Console.WriteLine("UP");
-                    break;
-                case Key.Down:
-                    Console.WriteLine("UP");
-                    break;
                 case Key.Left:
-                    Console.WriteLine("UP");
+                    if (!IsLeftCollision()) 
+                    { 
+                        for (int i = 0; i < tamañoPiezas; i++)
+                        {
+                            Canvas.SetLeft(GameArea.Children[ListaPiezas[piezaActiva].ArrayBloques[i]], ListaPiezas[piezaActiva].posBloquesX[i] -= 30);
+                        }
+                    }
                     break;
+                
                 case Key.Right:
-                    Console.WriteLine("UP");
+                    if (!IsRightCollision())
+                    {
+                        for (int i = 0; i < tamañoPiezas; i++)
+                        {
+                            Canvas.SetLeft(GameArea.Children[ListaPiezas[piezaActiva].ArrayBloques[i]], ListaPiezas[piezaActiva].posBloquesX[i] += 30);
+                        }
+                    }
+                    break;
+
+                case Key.Down:
+                    Console.WriteLine("Down");
                     break;
                 case Key.Space:
                     Console.WriteLine("UP");
