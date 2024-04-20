@@ -19,11 +19,13 @@ namespace WPFapp1
 
         public bool bajando = true;    // Bajando o parada
 
-        public int[] ArrayBloques = new int[4] { 0, 0, 0, 0 };  // Posición de children.add()
+        public int[] arrayBloques = new int[4] { 0, 0, 0, 0 };  // Posición de children.add()
 
         public int[] posBloquesX = new int[4] { 90, 120, 150, 180 };   // Posición en X
 
-        public int[] posBloquesY = new int[4] { -30, -30, -30, -30 };  // Posición en Y         
+        public int[] posBloquesY = new int[4] { -30, -30, -30, -30 };  // Posición en Y
+
+        public int[,] rotaciones = new int[4, 2];       
 
 
         public Pieza(int nRandom)
@@ -32,9 +34,15 @@ namespace WPFapp1
             DefinirPieza(tipo);
         }
 
+        public int[,] Rotar(int orientacion)
+        {
+            int[,] arrayRotacion = new int[4, 2] { { 30, -90}, { 0, -60}, { -30, -30 }, { -60, 0 } };
+            return arrayRotacion;
+        }
+
         public void DefinirPieza(int tipo)
         {
-            switch (tipo)
+            switch (tipo)      
             {
                 case 1:     // Hero (Pieza larga)
                     posBloquesX = [90, 120, 150, 180];

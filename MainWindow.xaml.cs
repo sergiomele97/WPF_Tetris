@@ -103,7 +103,7 @@ namespace WPFapp1
 
             for (int i = 0; i < tamañoPiezas; i++)
             {
-                Canvas.SetTop(GameArea.Children[ListaPiezas[piezaActiva].ArrayBloques[i]], ListaPiezas[piezaActiva].posBloquesY[i]+=30);
+                Canvas.SetTop(GameArea.Children[ListaPiezas[piezaActiva].arrayBloques[i]], ListaPiezas[piezaActiva].posBloquesY[i]+=30);
                 input = true;           // Colocarlo aquí asegura que X e Y no tengan valores negativos mientras haya input
             }
         }
@@ -234,7 +234,7 @@ namespace WPFapp1
 
             for (int i = 0; i < tamañoPiezas; i++)
             {
-                ListaPiezas[piezaActiva].ArrayBloques[i] = nGameAreaChildren;
+                ListaPiezas[piezaActiva].arrayBloques[i] = nGameAreaChildren;
 
                 DrawBloque(ListaPiezas[piezaActiva].posBloquesX[i], ListaPiezas[piezaActiva].posBloquesY[i]);
             }   
@@ -297,7 +297,7 @@ namespace WPFapp1
                     { 
                         for (int i = 0; i < tamañoPiezas; i++)
                         {
-                            Canvas.SetLeft(GameArea.Children[ListaPiezas[piezaActiva].ArrayBloques[i]], ListaPiezas[piezaActiva].posBloquesX[i] -= 30);
+                            Canvas.SetLeft(GameArea.Children[ListaPiezas[piezaActiva].arrayBloques[i]], ListaPiezas[piezaActiva].posBloquesX[i] -= 30);
                         }
                     }
                     break;
@@ -307,16 +307,27 @@ namespace WPFapp1
                     {
                         for (int i = 0; i < tamañoPiezas; i++)
                         {
-                            Canvas.SetLeft(GameArea.Children[ListaPiezas[piezaActiva].ArrayBloques[i]], ListaPiezas[piezaActiva].posBloquesX[i] += 30);
+                            Canvas.SetLeft(GameArea.Children[ListaPiezas[piezaActiva].arrayBloques[i]], ListaPiezas[piezaActiva].posBloquesX[i] += 30);
                         }
                     }
                     break;
 
                 case Key.Down:
                     Console.WriteLine("Down");
-                    break;
-                case Key.Space:
-                    Console.WriteLine("UP");
+                    break; 
+                case Key.Space: // Rotar
+                    if (input)              // HABRA QUE PONER MAS CONDICIONES  
+                    {
+                        int[,] arrayRotacion = ListaPiezas[piezaActiva].Rotar(ListaPiezas[piezaActiva].orientación);
+
+
+                        for (int i = 0; i < tamañoPiezas; i++)
+                        {
+                            Canvas.SetLeft(GameArea.Children[ListaPiezas[piezaActiva].arrayBloques[i]], ListaPiezas[piezaActiva].posBloquesX[i] += arrayRotacion[i,0]);
+                            Canvas.SetTop(GameArea.Children[ListaPiezas[piezaActiva].arrayBloques[i]], ListaPiezas[piezaActiva].posBloquesY[i] += arrayRotacion[i, 1]);
+                        }
+
+                    }
                     break;
             }
             
