@@ -109,14 +109,14 @@ namespace WPFapp1
         }
 
         //---------------------------------------------------------------------------------------------------------------------------------------------//
-        // COLISIONES
+        // COLISIONES: Es posible que se puedan refactorizar en una sola funcion de colision
         private bool IsBottomCollision()  // Si para uno solo de los bloques, hay pieza en [x,y+1]: devuelve true
         {
             for (int i = 0; i < tamañoPiezas; i++)
             {
                 if (ListaPiezas[piezaActiva].posBloquesY[i] <-30)    // Evita que se evalue la colisión en posiciones fuera del rango de tablero
                 {
-                    continue;                                        // En otras palabras, permite girar piezas en el limite superior sin que crashee
+                    continue;                                        // En otras palabras, permite mover
                 }
 
                 if (tablero[(ListaPiezas[piezaActiva].posBloquesX[i] + 30) / pixelesCuadrado, (ListaPiezas[piezaActiva].posBloquesY[i] + 30) / pixelesCuadrado])    // +30 compensa la primera columna pared del tablero
@@ -129,6 +129,12 @@ namespace WPFapp1
                     return true;                                // Devolver isColision() = True
                 }
             }
+            return false;
+        }
+
+        private bool IsSpinColission(int[,] arrayRotacion)
+        {
+
             return false;
         }
 
@@ -295,6 +301,28 @@ namespace WPFapp1
         *  CONTROLES
         */
 
+        private void RotarPieza()
+        {
+            int[,] arrayRotacion = ListaPiezas[piezaActiva].GetRotación();
+
+            if (!IsSpinColission(arrayRotacion))
+            {
+
+                for (int i = 0; i < tamañoPiezas; i++)
+                {
+                    Canvas.SetLeft(GameArea.Children[ListaPiezas[piezaActiva].arrayBloques[i]], ListaPiezas[piezaActiva].posBloquesX[i] += arrayRotacion[i, 0]);
+                    Canvas.SetTop(GameArea.Children[ListaPiezas[piezaActiva].arrayBloques[i]], ListaPiezas[piezaActiva].posBloquesY[i] += arrayRotacion[i, 1]);
+                }
+
+                // Actualizar orientacion
+                if (ListaPiezas[piezaActiva].orientacion < 3)
+                {
+                    ListaPiezas[piezaActiva].orientacion++;
+                }
+                else { ListaPiezas[piezaActiva].orientacion = 0; }
+            }
+        }
+
         private void Window_KeyUp(object sender, KeyEventArgs e)
         {
             switch (e.Key)
@@ -322,22 +350,18 @@ namespace WPFapp1
                 case Key.Down:
                     Console.WriteLine("Down");
                     break; 
-                case Key.Space: // Rotar
+
+                case Key.Space: // Rotar ¿Refactorizar en otra funcion rotar?
                     if (input)              // HABRA QUE PONER MAS CONDICIONES  
                     {
-                        int[,] arrayRotacion = ListaPiezas[piezaActiva].Rotar(ListaPiezas[piezaActiva].orientación);
-
-
-                        for (int i = 0; i < tamañoPiezas; i++)
-                        {
-                            Canvas.SetLeft(GameArea.Children[ListaPiezas[piezaActiva].arrayBloques[i]], ListaPiezas[piezaActiva].posBloquesX[i] += arrayRotacion[i,0]);
-                            Canvas.SetTop(GameArea.Children[ListaPiezas[piezaActiva].arrayBloques[i]], ListaPiezas[piezaActiva].posBloquesY[i] += arrayRotacion[i, 1]);
-                        }
+                        RotarPieza();
 
                     }
                     break;
             }
-            
+
         }
+
     }
+
 }
