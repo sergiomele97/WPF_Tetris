@@ -35,7 +35,7 @@ namespace WPFapp1
         int nCasillasX = 10;
         int nCasillasY = 16;
 
-        bool[,] tablero = new bool[12, 17]; // Array booleano con posiciones tablero
+        bool[,] tablero = new bool[12, 21]; // Array booleano con posiciones tablero
 
         bool input = false;  // Determina si se permite el input de teclas
 
@@ -114,6 +114,11 @@ namespace WPFapp1
         {
             for (int i = 0; i < tamañoPiezas; i++)
             {
+                if (ListaPiezas[piezaActiva].posBloquesY[i] <-30)    // Evita que se evalue la colisión en posiciones fuera del rango de tablero
+                {
+                    continue;                                        // En otras palabras, permite girar piezas en el limite superior sin que crashee
+                }
+
                 if (tablero[(ListaPiezas[piezaActiva].posBloquesX[i] + 30) / pixelesCuadrado, (ListaPiezas[piezaActiva].posBloquesY[i] + 30) / pixelesCuadrado])    // +30 compensa la primera columna pared del tablero
                 {
                     // Si hay colisión: Actualizamos pieza, tablero y devolvemos true
@@ -208,11 +213,13 @@ namespace WPFapp1
         // Dibuja un cuadrado
         public void DrawBloque(int x,int y)
         {
+            Color color = (Color)ColorConverter.ConvertFromString(ListaPiezas[piezaActiva].color);  // Igual hay formas mas eficientes
+
             Rectangle rect = new Rectangle
             {
                 Width = pixelesCuadrado,
                 Height = pixelesCuadrado,
-                Fill = Brushes.Yellow,
+                Fill = new SolidColorBrush(color),
                 Stroke = Brushes.Black,
                 StrokeThickness = 2
 
