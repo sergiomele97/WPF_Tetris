@@ -116,7 +116,7 @@ namespace WPFapp1
             {
                 if (ListaPiezas[piezaActiva].posBloquesY[i] <-30)    // Evita que se evalue la colisión en posiciones fuera del rango de tablero
                 {
-                    continue;                                        // En otras palabras, permite mover
+                    continue;                                        // En otras palabras, permite mover la pieza en la parte superior del canvas
                 }
 
                 if (tablero[(ListaPiezas[piezaActiva].posBloquesX[i] + 30) / pixelesCuadrado, (ListaPiezas[piezaActiva].posBloquesY[i] + 30) / pixelesCuadrado])    // +30 compensa la primera columna pared del tablero
@@ -134,7 +134,24 @@ namespace WPFapp1
 
         private bool IsSpinColission(int[,] arrayRotacion)
         {
+            for (int i = 0; i < tamañoPiezas; i++)
+            {
+                if (ListaPiezas[piezaActiva].posBloquesY[i] + arrayRotacion[i, 1] <= 0)    // Evita que se evalue la colisión en posiciones fuera del rango de tablero
+                {
+                    continue;                                        
+                }
 
+                if (ListaPiezas[piezaActiva].posBloquesX[i] + arrayRotacion[i, 0] < 0 || ListaPiezas[piezaActiva].posBloquesX[i] + arrayRotacion[i, 0] > nCasillasX*30)    // Colisión lateral extremo tablero
+                {
+                    return true;
+                }
+
+                // Esta expresion es la ubicación de destino en tablero
+                if (tablero[(ListaPiezas[piezaActiva].posBloquesX[i] + arrayRotacion[i, 0] + 30) / pixelesCuadrado, (ListaPiezas[piezaActiva].posBloquesY[i] + arrayRotacion[i, 1]) / pixelesCuadrado])         // +30 compensa la primera columna
+                {
+                    return true;                                        
+                }
+            }
             return false;
         }
 
@@ -142,6 +159,11 @@ namespace WPFapp1
         {
             for (int i = 0; i < tamañoPiezas; i++)
             {
+                if (ListaPiezas[piezaActiva].posBloquesY[i] < 0)    // Evita que se evalue la colisión en posiciones fuera del rango de tablero
+                {
+                    continue;                                        // En otras palabras, permite mover la pieza en la parte superior del canvas
+                }
+
                 if (tablero[(ListaPiezas[piezaActiva].posBloquesX[i] + 60) / pixelesCuadrado, (ListaPiezas[piezaActiva].posBloquesY[i]) / pixelesCuadrado])         // +61 compensa la primera columna + next cuadrado
                 {
                     return true;                                // Colision lateral          
@@ -154,6 +176,11 @@ namespace WPFapp1
         {
             for (int i = 0; i < tamañoPiezas; i++)
             {
+                if (ListaPiezas[piezaActiva].posBloquesY[i] < 0)    // Evita que se evalue la colisión en posiciones fuera del rango de tablero
+                {
+                    continue;                                        // En otras palabras, permite mover la pieza en la parte superior del canvas
+                }
+
                 if (tablero[(ListaPiezas[piezaActiva].posBloquesX[i]) / pixelesCuadrado, (ListaPiezas[piezaActiva].posBloquesY[i]) / pixelesCuadrado])         
                 {
                     return true;                                // Colision lateral          
@@ -298,7 +325,7 @@ namespace WPFapp1
 
         //---------------------------------------------------------------------------------------------------------------------------------------------//
         /*
-        *  CONTROLES
+        *  ROTACION PIEZA
         */
 
         private void RotarPieza()
@@ -322,6 +349,11 @@ namespace WPFapp1
                 else { ListaPiezas[piezaActiva].orientacion = 0; }
             }
         }
+
+        //---------------------------------------------------------------------------------------------------------------------------------------------//
+        /*
+        *  CONTROLES
+        */
 
         private void Window_KeyUp(object sender, KeyEventArgs e)
         {
