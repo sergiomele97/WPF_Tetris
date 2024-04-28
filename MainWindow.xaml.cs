@@ -23,7 +23,7 @@ namespace WPFapp1
          */
 
         int posY = 0;
-        List<Pieza> ListaPiezas = new List<Pieza>();
+        List<Pieza> ListaPiezas = new List<Pieza>();       
         int piezaActiva = -1;                // Señala el indice de la lista con la pieza en movimiento
         int nGameAreaChildren = 0;
 
@@ -37,7 +37,7 @@ namespace WPFapp1
 
         bool[,] tablero = new bool[12, 21]; // Array booleano con posiciones tablero
 
-        bool input = false;  // Determina si se permite el input de teclas
+        bool IsInputAllowed = false;  // Determina si se permite el input de teclas
 
         Random rnd = new Random();  // Para generar piezas aleatorias
 
@@ -104,7 +104,7 @@ namespace WPFapp1
             for (int i = 0; i < tamañoPiezas; i++)
             {
                 Canvas.SetTop(GameArea.Children[ListaPiezas[piezaActiva].arrayBloques[i]], ListaPiezas[piezaActiva].posBloquesY[i]+=30);
-                input = true;           // Colocarlo aquí asegura que X e Y no tengan valores negativos mientras haya input
+                IsInputAllowed = true;           // Colocarlo aquí asegura que X e Y no tengan valores negativos mientras haya input
             }
         }
 
@@ -123,8 +123,9 @@ namespace WPFapp1
                 {
                     // Si hay colisión: Actualizamos pieza, tablero y devolvemos true
 
-                    input = false;
+                    IsInputAllowed = false;
                     BottomCollision();
+                    
 
                     return true;                                // Devolver isColision() = True
                 }
@@ -192,10 +193,13 @@ namespace WPFapp1
         private void BottomCollision()
         {
             ListaPiezas[piezaActiva].bajando = false;   // Actualizar Pieza
+            int[] arrayValoresY = new int[5] { 0, 0, 0, 0, 0};           // Creamos un array para guardar las posiciones en y involucradas en la colision
 
             for (int c = 0; c < tamañoPiezas; c++)      // Actualizar Tablero
             {
                 tablero[(ListaPiezas[piezaActiva].posBloquesX[c]) / pixelesCuadrado + 1, (ListaPiezas[piezaActiva].posBloquesY[c] + 1) / pixelesCuadrado] = true;   // +1 compensa la primera columna pared del tablero
+
+                arrayValoresY[c] = (ListaPiezas[piezaActiva].posBloquesY[c] + 1) / pixelesCuadrado; 
             }
 
             if (IsGameOver())
@@ -203,6 +207,16 @@ namespace WPFapp1
                 GameOver();
             }
 
+            for (int i = 0; i < arrayValoresY.Length - 1; i++)     // Le pasamos las lineas (y) involucradas en esta colision
+            {
+                if (arrayValoresY[i] != arrayValoresY[i + 1])   // Llamamos a IsLineCompleted para cada linea involucrada
+                {
+                    if (IsLineCompleted(arrayValoresY[i]))
+                    {
+                        LineCompleted(arrayValoresY[i]);
+                    }
+                }
+            }
         }
 
         // FIN DE PARTIDA
@@ -352,6 +366,40 @@ namespace WPFapp1
 
         //---------------------------------------------------------------------------------------------------------------------------------------------//
         /*
+        *  LINEA COMPLETADA
+        */
+
+        private bool IsLineCompleted(int linea)
+        {
+            
+            for(int i = 1; i <= nCasillasX; i++)
+            {
+                if (tablero[i,linea] == false)
+                {
+                    return false;
+                }
+            } 
+            return true;
+        }
+
+        private void LineCompleted(int linea)
+        {
+            // Actualizar tablero
+
+
+            // Actualizar piezas
+
+
+            // Actualizar Canvas
+            
+        }
+
+
+
+
+
+        //---------------------------------------------------------------------------------------------------------------------------------------------//
+        /*
         *  CONTROLES
         */
 
@@ -360,7 +408,7 @@ namespace WPFapp1
             switch (e.Key)
             {
                 case Key.Left:
-                    if (input && !IsLeftCollision())    //  IMPORTANTE && y orden operandos: Si llamamos a !IsLeftC... cuando no se admite input, el juego puede crashear
+                    if (IsInputAllowed && !IsLeftCollision())    //  IMPORTANTE && y orden operandos: Si llamamos a !IsLeftC... cuando no se admite input, el juego puede crashear
                     { 
                         for (int i = 0; i < tamañoPiezas; i++)
                         {
@@ -370,7 +418,7 @@ namespace WPFapp1
                     break;
                 
                 case Key.Right:
-                    if (input && !IsRightCollision())   //  IMPORTANTE && y orden operandos: Si llamamos a !IsLeftC... cuando no se admite input, el juego puede crashear
+                    if (IsInputAllowed && !IsRightCollision())   //  IMPORTANTE && y orden operandos: Si llamamos a !IsLeftC... cuando no se admite input, el juego puede crashear
                     {
                         for (int i = 0; i < tamañoPiezas; i++)
                         {
@@ -383,8 +431,8 @@ namespace WPFapp1
                     Console.WriteLine("Down");
                     break; 
 
-                case Key.Space: // Rotar ¿Refactorizar en otra funcion rotar?
-                    if (input)              // HABRA QUE PONER MAS CONDICIONES  
+                case Key.Space: 
+                    if (IsInputAllowed)                
                     {
                         RotarPieza();
 
