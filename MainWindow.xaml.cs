@@ -1,4 +1,5 @@
-﻿using System.Text;
+﻿using System;
+using System.Text;
 using System.Windows;
 using System.Windows.Controls;
 using System.Windows.Data;
@@ -88,7 +89,7 @@ namespace WPFapp1
         private void NextTick()
         {
             IsBottomCollision();
-            ActualizarPiezas();        
+            ActualizarPiezas();
         }
 
         //---------------------------------------------------------------------------------------------------------------------------------------------//
@@ -213,7 +214,7 @@ namespace WPFapp1
                 {
                     if (IsLineCompleted(arrayValoresY[i]))
                     {
-                        LineCompleted(arrayValoresY[i]);
+                        LineCompleted(arrayValoresY[i] * pixelesCuadrado);
                     }
                 }
             }
@@ -379,19 +380,48 @@ namespace WPFapp1
                     return false;
                 }
             } 
+
             return true;
         }
 
-        private void LineCompleted(int linea)
+        private void LineCompleted(int y)
         {
-            // Actualizar tablero
+
+            // Borra tablero por encima y en la linea
+
+            for (int i = 1; i <= nCasillasX; i++)   
+            {
+                for (int j = 0; j <= y/pixelesCuadrado; j++) 
+                {
+                    tablero[i, j] = false;
+                }
+            }
+
+            // Actualizar Canvas + tablero
+
+            int c = 0;
+            foreach(UIElement child in GameArea.Children)   // Unica forma de iterarsobre los children
+            {
+                if (c < 160 || child.IsVisible == false)    // Evita mover los bloques del background y los invisibles
+                {
+                    c++;
+                    continue;
+                }
+
+                int childY = Convert.ToInt32(Canvas.GetTop(child));     // Y en pixeles 
+                int childX = Convert.ToInt32(Canvas.GetLeft(child));    // X en pixeles
 
 
-            // Actualizar piezas
-
-
-            // Actualizar Canvas
-            
+                if (y > childY)     // Caso bajando
+                {
+                    Canvas.SetTop(child, (childY + pixelesCuadrado));      // Actualiza canvas
+                    tablero[childX / pixelesCuadrado + 1,(childY + pixelesCuadrado) / pixelesCuadrado] = true;   // Actualiza tablero (+1 columna vacia)
+                }
+                else if (y == childY)   // Caso en linea eliminada
+                {
+                    child.Visibility = Visibility.Collapsed;    // Hace que el elemento no sea visible
+                }
+            }
         }
 
 
