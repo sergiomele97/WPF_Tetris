@@ -1,4 +1,7 @@
-﻿using System;
+﻿using Microsoft.Win32;
+using System;
+using System.Numerics;
+using System.Reflection;
 using System.Text;
 using System.Windows;
 using System.Windows.Controls;
@@ -41,6 +44,8 @@ namespace WPFapp1
         bool IsInputAllowed = false;  // Determina si se permite el input de teclas
 
         Random rnd = new Random();  // Para generar piezas aleatorias
+
+        private MediaPlayer mediaPlayer = new MediaPlayer();    // Audio
 
 
         //---------------------------------------------------------------------------------------------------------------------------------------------//
@@ -250,6 +255,22 @@ namespace WPFapp1
 
             // Go!          
             gameTickTimer.IsEnabled = true;
+
+            // Audio
+            mediaPlayer.Open(new Uri(System.IO.Path.GetDirectoryName(Assembly.GetExecutingAssembly().Location) + @"\..\..\..\Audio\OriginalTetrisTheme.mp3"));
+            mediaPlayer.Play();
+            mediaPlayer.MediaEnded += new EventHandler(Media_Ended);    // Canción en bucle
+        }
+
+
+        //---------------------------------------------------------------------------------------------------------------------------------------------//
+        /*
+        *  MUSICA
+        */
+        private void Media_Ended(object sender, EventArgs e)
+        {
+            mediaPlayer.Position = TimeSpan.Zero;
+            mediaPlayer.Play();
         }
 
 
@@ -423,9 +444,6 @@ namespace WPFapp1
                 }
             }
         }
-
-
-
 
 
         //---------------------------------------------------------------------------------------------------------------------------------------------//
